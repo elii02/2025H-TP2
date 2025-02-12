@@ -110,7 +110,6 @@ def update_convention(old_convention_dict):
         if 'date_of_scan' in value:
             value['date_of_scan'] = value['date_of_scan'].replace("-", "\\")
         
-    ##########ADD NAN33333
     # Fin du code
 
     return new_convention_dict
@@ -178,33 +177,31 @@ def fetch_statistics(patients_dict):
 
     # TODO : Écrire votre code ici
     metrics = {'M':{}, 'F':{}}
-    metrics['M'] = {
-        'age':{'mean':{}, 'std': {}}, 
-        'height':{'mean':{}, 'std': {}}, 
-        'weight':{'mean':{}, 'std': {}}
-        }
-    metrics['F'] = {
-        'age':{'mean':{}, 'std': {}}, 
-        'height':{'mean':{}, 'std': {}}, 
-        'weight':{'mean':{}, 'std': {}}
-        }
-    
-    age_m = []
-    for key, value in patients_dict.items():
-        if 'sex' in value:
-            if value['sex']=='M':
-                if 'age' in value:
-                    age_m.append(value['sex'])  
+    metrics['M'] = {'age':{'mean':{}, 'std': {}},'height':{'mean':{}, 'std': {}}, 'weight':{'mean':{}, 'std': {}}}
+    metrics['F'] = {'age':{'mean':{}, 'std': {}},'height':{'mean':{}, 'std': {}}, 'weight':{'mean':{}, 'std': {}}}
 
+    def math(stats,sex,key):
+        values = []
+        for value in patients_dict.values():
+            if 'sex' in value:
+                if value['sex'] == sex:
+                    if key in value and value[key] != None:
+                        values.append(float(value[key]))   
+                        
+        if stats == 'mean':
+            return sum(values)/len(values)  
+        elif stats == 'std':
+            return statistics.stdev(values)
+        
+    keys = ['age', 'height', 'weight']
+    for key in keys:
+        metrics['M'][key] = math('mean', 'M',key)
+        metrics['M'][key] = math('std', 'M',key)
+        metrics['F'][key] = math('mean', 'M',key)
+        metrics['F'][key] = math('std', 'M',key)
 
-        if 'age' in value:
-
-    print(metrics)
-
-    
-
-    # Fin du code
-
+        # Fin du code
+        
     return metrics
 
 ########################################################################################################## 
