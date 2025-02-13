@@ -39,9 +39,7 @@ def load_csv(csv_path):
         del row['participant_id']
         patients_dict[patient_name] = row
     
-    #print(patients_dict['sub-tokyoIngenia04'])
-    #print("\n\n")
-   # print(patients_dict)
+    
     file.close()
 
     # Fin du code
@@ -107,8 +105,13 @@ def update_convention(old_convention_dict):
 
     # TODO : Écrire votre code ici
     for key, value in old_convention_dict.items():
-        if 'date_of_scan' in value:
-            value['date_of_scan'] = value['date_of_scan'].replace("-", "\\")
+        new_value = value.copy()
+        if 'date_of_scan' in new_value:
+            new_value['date_of_scan'] = new_value['date_of_scan'].replace("-", "\\")
+        if new_value['date_of_scan'] == 'n/a':
+            new_value['date_of_scan'] = None
+        new_convention_dict[key] = new_value
+    
         
     # Fin du code
 
@@ -185,20 +188,23 @@ def fetch_statistics(patients_dict):
         for value in patients_dict.values():
             if 'sex' in value:
                 if value['sex'] == sex:
-                    if key in value and value[key] != None:
-                        values.append(float(value[key]))   
+                    if key in value and value[key] is not None:
+                        try:
+                            values.append(float(value[key]))  
+                        except:
+                            continue
+                        
                         
         if stats == 'mean':
-            return sum(values)/len(values)  
+            return round(sum(values)/len(values),2)
         elif stats == 'std':
-            return statistics.stdev(values)
+            return round(statistics.stdev(values),2)
         
     keys = ['age', 'height', 'weight']
     for key in keys:
-        metrics['M'][key] = math('mean', 'M',key)
-        metrics['M'][key] = math('std', 'M',key)
-        metrics['F'][key] = math('mean', 'M',key)
-        metrics['F'][key] = math('std', 'M',key)
+        metrics['M'][key] = {'mean': math('mean', 'M',key), 'std': math('std', 'M',key)} 
+        metrics['F'][key] = {'mean': math('mean', 'F',key), 'std': math('std', 'F',key)} 
+       
 
         # Fin du code
         
@@ -223,10 +229,30 @@ def create_csv(metrics):
     paths_list : liste python (list)
         Liste contenant les chemins des deux fichiers "F_metrics.csv" et "M_metrics.csv"
     """
-    paths_list = []
+    paths_list = ['F_metrics.csv', 'M_metrics.csv']
 
     # TODO : Écrire votre code ici
+    file1 = open('F_metrics.csv', 'w')
+    file2 = open('M_metrics.csv', 'w')
+    
+    file1.write('stats,age,height,weight\n')
+    file2.write('stats,age,height,weight\n')
+    
+    #metrics['M'] = {'age':{'mean':{}, 'std': {}},'height':{'mean':{}, 'std': {}}, 'weight':{'mean':{}, 'std': {}}}
 
+    for sex, sex_data in metrics.items():
+        file = file1 if sex == 'F' else file2
+        for stat in ['mean', 'std']:
+            file.write(stat + ',' )
+            for c in ['age', 'height', 'weight']:
+                file.write(str(sex_data[c][stat]))
+                if c != 'weight': 
+                    file.write(',')
+            file.write('\n')
+                
+
+    file1.close()
+    file2.close()
 
     # Fin du code
 
@@ -272,7 +298,7 @@ if __name__ == '__main__':
     new_patients_dict = update_convention(patients_dict)
 
     # Affichage du résultat
-    print("Partie 3: \n\n", patients_dict, "\n")
+    print("Partie 3: \n\n", new_patients_dict, "\n")
 
     ######################
     # Tester la partie 4 #
