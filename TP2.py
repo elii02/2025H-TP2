@@ -193,12 +193,21 @@ def fetch_statistics(patients_dict):
                             values.append(float(value[key]))  
                         except:
                             continue
-                        
-                        
+    
         if stats == 'mean':
-            return round(sum(values)/len(values),2)
+            mean = round(sum(values)/len(values),2)
+            return mean
         elif stats == 'std':
-            return round(statistics.stdev(values),2)
+            mean = sum(values)/len(values)
+            sum_xi_square = []
+            for x in values :
+                xi_square = (x - mean)**2
+                sum_xi_square.append(float(xi_square))
+            numerator = sum(sum_xi_square)
+            denominator = len(sum_xi_square) -1
+            std = (numerator/denominator)**0.5
+            print(statistics.stdev(values))
+            return f"{std:.2f}"
         
     keys = ['age', 'height', 'weight']
     for key in keys:
