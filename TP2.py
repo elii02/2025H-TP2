@@ -73,7 +73,7 @@ def load_multiple_csv(csv_path1, csv_path2):
 
     
     for key, value in patients_dict2.items():
-        if key not in patients_dict:
+        if key not in patients_dict: 
             patients_dict[key] = value
 
     #print(patients_dict)
@@ -145,9 +145,9 @@ def fetch_candidates(patients_dict):
         if 'sex' in value:
             if value['sex'] == 'F':
                 if 'age' in value:
-                    if int(value['age']) >= 25 and int(value['age']) <= 32:
+                    if int(value['age']) >= 25 and int(value['age']) <= 32: 
                         if 'height' in value:
-                            if int(value['height']) > 170:
+                            if float(value['height']) > 170:
                                 candidates_list.append(key)
 
 
@@ -188,14 +188,14 @@ def fetch_statistics(patients_dict):
         for value in patients_dict.values():
             if 'sex' in value:
                 if value['sex'] == sex:
-                    if key in value and value[key] is not None:
+                    if key in value and value[key] is not None: 
                         try:
                             values.append(float(value[key]))  
                         except:
                             continue
     
         if stats == 'mean':
-            mean = round(sum(values)/len(values),2)
+            mean = round(sum(values)/len(values),2) 
             return mean
         elif stats == 'std':
             mean = sum(values)/len(values)
@@ -206,7 +206,7 @@ def fetch_statistics(patients_dict):
             numerator = sum(sum_xi_square)
             denominator = len(sum_xi_square) -1
             std = (numerator/denominator)**0.5
-            print(statistics.stdev(values))
+            #print(statistics.stdev(values))
             return f"{std:.2f}"
         
     keys = ['age', 'height', 'weight']
@@ -247,7 +247,6 @@ def create_csv(metrics):
     file1.write('stats,age,height,weight\n')
     file2.write('stats,age,height,weight\n')
     
-    #metrics['M'] = {'age':{'mean':{}, 'std': {}},'height':{'mean':{}, 'std': {}}, 'weight':{'mean':{}, 'std': {}}}
 
     for sex, sex_data in metrics.items():
         file = file1 if sex == 'F' else file2
